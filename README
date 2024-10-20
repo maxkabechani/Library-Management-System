@@ -1,0 +1,88 @@
+# Library Management System
+
+## Overview
+
+The Library Management System is a comprehensive web application designed to streamline library operations. It provides separate interfaces for librarians and students, facilitating efficient management of books, user accounts, borrowing processes, and penalties.
+
+## Features
+
+- **User Management**: 
+  - Separate interfaces for librarians and students
+  - Secure authentication and authorization
+
+- **Book Management**: 
+  - Add, edit, and delete books
+  - Track book status (available, borrowed, reserved)
+
+- **Borrowing and Returning**:
+  - Borrow books with automated due date calculation
+  - Return books with automatic penalty calculation for overdue items
+
+- **Reservation System**: 
+  - Allow students to reserve books
+  - Automated conversion of reservations to borrowings
+
+- **Penalty Management**: 
+  - Automatic penalty calculation for overdue books
+  - Payment tracking system
+
+- **File Upload**: 
+  - Upload and manage past examination papers
+
+## Tech Stack
+
+- **Backend**: Node.js with Fastify framework
+- **Database**: PostgreSQL
+- **Frontend**: React.js
+- **Authentication**: Session Auth
+- **File Storage**: Local file system
+
+## Installation
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/your-username/library-management-system.git
+   cd library-management-system
+   ```
+
+2. Set up the backend:
+   ```
+   cd backend
+   npm install
+   # Edit database credentials
+   change postgres connection string in database.js, server.js and config/default.json
+   npm run migrate
+   npm run seed
+   npm start
+   ```
+
+3. Set up the frontend:
+   ```
+   cd ../frontend/librarian
+   npm install
+   npm start
+
+   cd ../student
+   npm install
+   npm start
+   ```
+
+## Usage
+
+1. Access the librarian interface at `http://localhost:4000`
+2. Access the student interface at `http://localhost:4001`
+
+## API Endpoints
+
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
