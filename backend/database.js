@@ -4,7 +4,7 @@ import fastifyPostgres from '@fastify/postgres';
 async function dbConnector(app) {
     try {
         await app.register(fastifyPostgres, {
-            connectionString: "postgresql://postgres:InbinesDatabase@localhost:5432/lms",
+            connectionString: "postgresql://postgres:LMSPassword@localhost:5432/lms",
         });
     } catch (error) {
         app.log.error('Error connecting to PostgreSQL:', error);

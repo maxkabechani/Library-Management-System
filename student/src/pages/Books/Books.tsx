@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Book, columns } from "./columns"
 import { DataTable } from "@/components/ui/data-table"
 import { fetchBooks } from "@/services/api";
-import { useNavigate } from "react-router-dom";
 
 export default function Books() {
 

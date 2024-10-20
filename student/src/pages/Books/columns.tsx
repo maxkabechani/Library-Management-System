@@ -6,10 +6,10 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Link } from "react-router-dom"
+import { AxiosError } from "axios"
+import { reserveBook } from "@/services/api"
 
 export type Book = {
     book_id: number,
@@ -19,6 +19,20 @@ export type Book = {
     published_year: number,
     edition: number,
     location: string
+}
+
+async function handleReserve(id:number) {
+    try {
+        const res = await reserveBook(id);
+        if (res.success) {
+            window.location.reload();
+        }
+    } catch (error) {
+        console.log(error)
+        if (error instanceof AxiosError) {
+            console.log(error.response?.data)
+        }
+    }
 }
 
 export const columns: ColumnDef<Book>[] = [
@@ -69,17 +83,9 @@ export const columns: ColumnDef<Book>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>
-                            <Link to={`/lend-book/${book.book_id}`}>
-                                Lend Book
-                            </Link>
+                        <DropdownMenuItem onClick={()=> handleReserve(book.book_id)}>
+                                Reserve Book
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <Link to={`/edit-book/${book.book_id}`}>
-                                Edit Book Details
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
                     </DropdownMenuContent>
                 </DropdownMenu>
             )

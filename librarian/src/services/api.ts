@@ -56,14 +56,10 @@ export const fetchReservedBooks = async () => {
 }
 
 export const findStudent = async (student_id: string) => {
-    try {
-        const response = await axios.post('/find-student', {
-            student_id
-        });
-        return response.data;
-    } catch (error) {
-        console.log(error)
-    }
+    const response = await axios.post('/find-student', {
+        student_id
+    });
+    return response;
 }
 export const getBook = async (id: string) => {
     try {
@@ -72,6 +68,16 @@ export const getBook = async (id: string) => {
         return response.data;
     } catch (error) {
         console.log(error)
+    }
+}
+
+export const deleteBook = async (id: number) => {
+    try {
+        const response = await axios.post(`/delete-book/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching past-papers:', error);
+        throw error;
     }
 }
 
@@ -115,7 +121,7 @@ export const addBook = async (title: string,
         throw error;
     }
 }
-export const editBook = async (id:string, title: string,
+export const editBook = async (id: string, title: string,
     author: string,
     isbn: string,
     publishedYear: number,

@@ -10,6 +10,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Link } from "react-router-dom"
+import { deleteBook } from "@/services/api"
+import { AxiosError } from "axios"
 
 export type Book = {
     book_id: number,
@@ -19,6 +21,20 @@ export type Book = {
     published_year: number,
     edition: number,
     location: string
+}
+
+async function handleReturn(id: number) {
+    try {
+        const res = await deleteBook(id);
+        if (res.success) {
+            window.location.reload();
+        }
+    } catch (error) {
+        console.log(error)
+        if (error instanceof AxiosError) {
+            console.log(error.response?.data)
+        }
+    }
 }
 
 export const columns: ColumnDef<Book>[] = [
@@ -79,7 +95,13 @@ export const columns: ColumnDef<Book>[] = [
                                 Edit Book Details
                             </Link>
                         </DropdownMenuItem>
+                        
                         <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-red-500"
+                            onClick={() => handleReturn(book.book_id)}
+                        >
+                            Delete Book
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             )

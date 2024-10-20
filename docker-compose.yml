@@ -1,0 +1,58 @@
+services:
+  # Librarian app service
+  librarian:
+    build: ./librarian
+    ports:
+      - "${LIBRARIAN_FRONTEND_PORT}:4000"
+    env_file: .env
+    depends_on:
+      - backend
+    networks:
+      - lms-network
+
+  # Student app service
+  student:
+    build: ./student
+    ports:
+      - "${STUDENT_FRONTEND_PORT}:4000"
+    env_file: .env
+    depends_on:
+      - backend
+    networks:
+      - lms-network
+
+  # Fastify backend service
+  backend:
+    build: ./backend
+    ports:
+      - "${BACKEND_PORT}:3000"
+    env_file: .env
+    depends_on:
+      - database
+    environment:
+      - DATABASE_URL=${DB_URL}
+    networks:
+      - lms-network
+
+  # PostgreSQL database service
+  database:
+    image: postgres:17
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - lms-db-data:/var/lib/postgresql/data
+    ports:
+
+      - "5432:5432"
+    networks:
+      - lms-network
+
+networks:
+  lms-network:
+
+
+volumes:
+  lms-db-data:

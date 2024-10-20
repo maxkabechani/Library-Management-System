@@ -4,8 +4,26 @@ import { defineConfig } from "vite"
 
 export default defineConfig({
   plugins: [react()],
+  preview: {
+    port: 4000,
+    strictPort: true,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return id.toString().split('node_modules/')[1].split('/')[0].toString();
+          }
+        }
+      }
+    }
+  },
   server: {
-    port: 4000
+    port: 4000,
+    strictPort: true,
+    host: true,
+    origin: "http://0.0.0.0:4000",
   },
   resolve: {
     alias: {

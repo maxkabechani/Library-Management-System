@@ -21,7 +21,7 @@ const __dirname = dirname(__filename);
 
 const app = Fastify({ logger: true });
 app.register(FastifyCors, {
-    origin: ["http://localhost:4000", "http://localhost:4001"],
+    origin: ["http://localhost:4000", "http://localhost:4001", "http://192.168.0.138:4000", "http://192.168.0.138:4001"],
     credentials: true
 })
 app.register(Bcrypt, {
@@ -37,7 +37,7 @@ app.register(dbConnector);
 const ConnectSession = Connect(Session);
 const sessionStore = new ConnectSession({
     conObject: {
-        connectionString: "postgresql://postgres:InbinesDatabase@localhost:5432/lms",
+        connectionString: "postgresql://postgres:LMSPassword@localhost:5432/lms",
         ssl: false,
     },
     tableName: 'session',
@@ -64,11 +64,11 @@ app.register(studentRoutes, { prefix: "/api/student" })
 
 app.get('/download/:filename', async (req, reply) => {
     const { filename } = req.params;
-    const decodedFilename = decodeURIComponent(filename); 
+    const decodedFilename = decodeURIComponent(filename);
     const filePath = join(__dirname, 'uploads', 'past-papers', decodedFilename);
 
     if (fs.existsSync(filePath)) {
-        return reply.sendFile(decodedFilename, join(__dirname, 'uploads', 'past-papers')); 
+        return reply.sendFile(decodedFilename, join(__dirname, 'uploads', 'past-papers'));
     } else {
         return reply.status(404).send({ error: 'File not found' });
     }

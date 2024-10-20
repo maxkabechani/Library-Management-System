@@ -30,9 +30,10 @@ import {
 import { CalendarIcon } from "lucide-react"
 
 export default function AddBorrowedBook() {
-    const { id } = useParams<{id: string}>()
+    const { id } = useParams<{ id: string }>()
     const { toast } = useToast()
     const [studentID, setStudentID] = useState('')
+    const [studentError, setStudentError] = useState<string | null>(null)
     const form = useForm<z.infer<typeof AddBorrowedBookSchema>>({
         resolver: zodResolver(AddBorrowedBookSchema),
         defaultValues: {
@@ -69,13 +70,23 @@ export default function AddBorrowedBook() {
     }, [id, form]);
 
     async function handleFindStudent(e: React.FormEvent) {
-        e.preventDefault()
-        const res = await findStudent(studentID);
-        console.log(res);
-        form.setValue('student_id', res.student_id)
-        form.setValue('first_name', res.first_name)
-        form.setValue('last_name', res.last_name)
-        
+        try {
+            e.preventDefault()
+            setStudentError(null)
+            const res = await findStudent(studentID);
+            // console.log(res);
+            form.setValue('student_id', res.data.student_id)
+            form.setValue('first_name', res.data.first_name)
+            form.setValue('last_name', res.data.last_name)
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                console.log(error.response?.data)
+                setStudentError(error.response?.data)
+            }
+                
+            
+        }
+
     }
 
 
@@ -91,7 +102,6 @@ export default function AddBorrowedBook() {
                     title: "Book Lent",
                     description: "Book has been Lent successfully.",
                 })
-                form.reset()
             }
         } catch (error) {
             console.log(error)
@@ -100,6 +110,7 @@ export default function AddBorrowedBook() {
             }
         }
     }
+    const isStudentFound = form.watch("student_id") > 0;
 
     const isSubmitting = form.formState.isSubmitting
 
@@ -119,18 +130,16 @@ export default function AddBorrowedBook() {
                         </CardHeader>
                         <form onSubmit={handleFindStudent}>
                             <CardContent>
-
                                 <Input name="studentID" onChange={(e) => setStudentID(e.target.value)} placeholder="Student ID" />
-
-
+                                <p className="text-red-600">{studentError}</p>
                             </CardContent>
-
+                            
                             <CardFooter className="border-t px-6 py-4">
                                 <Button type="submit">Search</Button>
                             </CardFooter>
                         </form>
                     </Card>
-                    <Card x-chunk="dashboard-04-chunk-2">
+                    {isStudentFound && (<Card x-chunk="dashboard-04-chunk-2">
                         <CardHeader>
                             <CardTitle>Student & Book Details</CardTitle>
                             <CardDescription>
@@ -283,7 +292,8 @@ export default function AddBorrowedBook() {
                                 </form>
                             </Form>
                         </CardContent>
-                    </Card>
+                    </Card>)}
+                    
                 </div>
             </div>
         </main>

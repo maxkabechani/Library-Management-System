@@ -1,5 +1,5 @@
 {
     "db": {
-        "url": "postgresql://postgres:InbinesDatabase@localhost:5432/lms"
+        "url": "postgresql://postgres:LMSPassword@localhost:5432/lms"
     }
 }

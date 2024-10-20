@@ -12,7 +12,7 @@ exports.up = async (pgm) => {
         return {
             title: file.replace('.pdf', ''),
             school_id: 1,
-            filePath: `uploads/past-papers/${file}`, // Path to the file
+            filePath: file,
             librarianId: faker.helpers.arrayElement(librarians).librarian_id,
         };
     });

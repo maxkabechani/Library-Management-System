@@ -12,7 +12,6 @@ import Books from './pages/Books/Books.tsx';
 import BorrowedBooks from './pages/BorrowedBook/BorrowedBooks.tsx';
 import ReservedBooks from './pages/ReservedBook/ReservedBooks.tsx';
 import PastPapers from './pages/PastPapers/PastPapers.tsx';
-import path from 'path';
 import AllPastPapers from './pages/PastPapers/AllPastPapers.tsx';
 
 const router = createBrowserRouter([

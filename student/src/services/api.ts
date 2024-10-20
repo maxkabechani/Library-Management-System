@@ -64,3 +64,8 @@ export const fetchPastPapers = async () => {
         throw error;
     }
 }
+
+export const reserveBook = async (id: number) => {
+    const response = await axios.get(`/reserve-book/${id}`);
+    return response.data;
+}

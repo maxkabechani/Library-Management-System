@@ -100,7 +100,7 @@ export async function getBooks(req, reply) {
 
 export async function getBorrowedBooks(req, reply) {
     try {
-        const books = await req.server.queryDb("SELECT title, status, edition, borrow_date, due_date, author FROM student s JOIN borrowed_book b ON b.student_id = s.student_id JOIN book ON book.book_id = b.book_id WHERE s.student_id = $1",[req.session.student.id]);
+        const books = await req.server.queryDb("SELECT title, status, edition, borrow_date, due_date, author FROM student s JOIN borrowed_book b ON b.student_id = s.student_id JOIN book ON book.book_id = b.book_id WHERE s.student_id = $1", [req.session.student.id]);
         return books;
     } catch (error) {
 
@@ -108,7 +108,7 @@ export async function getBorrowedBooks(req, reply) {
 }
 export async function getReservedBooks(req, reply) {
     try {
-        const books = await req.server.queryDb("SELECT title, status, edition, reserved_at, author FROM student s JOIN reserved_book r ON r.student_id = s.student_id JOIN book ON book.book_id = r.book_id WHERE s.student_id = $1",[req.session.student.id]);
+        const books = await req.server.queryDb("SELECT title, status, edition, reserved_at, author FROM student s JOIN reserved_book r ON r.student_id = s.student_id JOIN book ON book.book_id = r.book_id WHERE s.student_id = $1", [req.session.student.id]);
         return books;
     } catch (error) {
 
@@ -121,5 +121,16 @@ export async function getPastPapers(req, reply) {
         return pastPapers;
     } catch (error) {
 
+    }
+}
+
+
+export async function reserveBook(req, reply) {
+    try {
+        const { id } = req.params;
+        const reserveBook = await req.server.queryDb("INSERT INTO reserved_book (book_id, student_id) VALUES ($1, $2)", [id, req.session.student.id]);
+        return { success: true }
+    } catch (error) {
+        return error
     }
 }

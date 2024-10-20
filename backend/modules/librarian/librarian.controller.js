@@ -1,4 +1,3 @@
-import { librarians } from "../mock.database.js";
 import fs from 'fs';
 import { join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
@@ -166,7 +165,7 @@ export async function addBorrowedBook(req, reply) {
 export async function returnBook(req, reply) {
     try {
         console.log(req.body)
-        const { id} = req.params;
+        const { id } = req.params;
         const book = await req.server.queryDb("UPDATE borrowed_book SET status = 'returned' WHERE borrow_id = $1", [id]);
         return { success: true }
     } catch (error) {
@@ -178,7 +177,7 @@ export async function returnBook(req, reply) {
 
 export async function getReservedBooks(req, reply) {
     try {
-        const query = "SELECT student.student_id, student.first_name, student.last_name, book.title, book.author, published_year, edition FROM student JOIN reserved_book ON reserved_book. student_id = student.student_id JOIN book ON book.book_id = reserved_book.book_id;"
+        const query = "SELECT student.student_id, student.first_name, student.last_name, book.title, book.author, published_year, book.edition FROM student JOIN reserved_book ON reserved_book. student_id = student.student_id JOIN book ON book.book_id = reserved_book.book_id;"
         const books = await req.server.queryDb(query)
         return books;
 
@@ -187,6 +186,29 @@ export async function getReservedBooks(req, reply) {
         return reply.status(501).send("Internal Server Error");
     }
 }
+
+export async function reservedToBorrowed(req, reply) {
+    try {
+        const { id } = req.params
+        const reserved_book = await req.server.queryDb("SELECT * FROM reserved_book WHERE reserved_id =  $1", [id]);
+        const info = reserved_book[0]
+        const borrow_book = req.server.queryDb("INSERT INTO borrowed_book (book_id, student_id, librarian_id, due_date, status) VALUES ($1, $2, $3, $4, 'borrowed'", [info])
+    } catch (error) {
+
+    }
+}
+
+export async function deleteBook(req, reply) {
+    try {
+        const { id } = req.params;
+        const deleteBook = await req.server.queryDb("DELETE FROM book WHERE book_id = $1", [id]);
+        return { success: true }
+    } catch (error) {
+        return error
+    }
+}
+
+
 
 
 export async function addBook(req, reply) {

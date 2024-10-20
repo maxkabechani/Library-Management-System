@@ -1,4 +1,4 @@
-import { Dashboard, getBooks, getBorrowedBooks, getPastPapers, getReservedBooks, getStudent, loginStudent } from "./student.controller.js";
+import { Dashboard, getBooks, getBorrowedBooks, getPastPapers, getReservedBooks, getStudent, loginStudent, reserveBook } from "./student.controller.js";
 import path from 'path';
 import fs from 'fs';
 
@@ -68,8 +68,6 @@ export default async function studentRoutes(app) {
     app.get('/borrowed-books', getBorrowedBooks);
     app.get('/reserved-books', getReservedBooks);
     app.get('/past-papers', getPastPapers);
-
-
-
+    app.get('/reserve-book/:id', reserveBook)
 }
 
