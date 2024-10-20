@@ -1,4 +1,4 @@
-import { addBook, addBorrowedBook, createLibrarian, Dashboard, deleteBook, editBook, findStudent, getBook, getBooks, getBorrowedBooks, getLibrarian, getPastPapers, getReservedBooks, loginLibrarian, returnBook } from "./librarian.controller.js";
+import { addBook, addBorrowedBook, addPastPaper, createLibrarian, Dashboard, deleteBook, editBook, findStudent, getBook, getBooks, getBorrowedBooks, getLibrarian, getPastPapers, getReservedBooks, getSchools, loginLibrarian, reservedToBorrowed, returnBook } from "./librarian.controller.js";
 
 
 
@@ -99,14 +99,14 @@ export default async function librarianRoutes(app) {
     }, addBook);
 
     app.get('/past-papers', getPastPapers);
-
+    app.post('/past-paper', addPastPaper);
     app.post('/find-student', findStudent);
     app.get('/book/:id', getBook);
     app.post('/edit-book/:id', editBook);
     app.post('/return-book/:id', returnBook);
     app.post('/delete-book/:id', deleteBook);
-
-
     app.post('/lend-book', addBorrowedBook);
+    app.post('/reserved-borrowed/:id', reservedToBorrowed);
+    app.get('/schools', getSchools);
 
 }

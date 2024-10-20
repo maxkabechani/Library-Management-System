@@ -11,6 +11,8 @@ import dbConnector from "./database.js"
 import fastifyStatic from "@fastify/static";
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { createWriteStream } from 'fs'
+import { pipeline } from 'stream/promises'
 
 import path from 'path'
 import fs from 'fs';
@@ -31,7 +33,8 @@ app.register(Cookie);
 app.register(fastifyStatic, {
     root: path.join(__dirname, 'uploads', 'past-papers'),
     prefix: '/past-papers/', // optional: you can use a prefix for easier routing
-}); app.register(fastifyMultipart)
+}); 
+app.register(fastifyMultipart)
 
 app.register(dbConnector);
 const ConnectSession = Connect(Session);

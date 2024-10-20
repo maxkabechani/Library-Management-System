@@ -59,7 +59,7 @@ export default async function studentRoutes(app) {
         },
     }, loginStudent);
 
-    app.post('/logout', { preValidation: [authPreValidation] }, async (req, reply) => {
+    app.post('/logout', async (req, reply) => {
         await req.session.destroy()
     })
 

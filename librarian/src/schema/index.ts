@@ -25,7 +25,10 @@ export const AddBookSchema = z.object({
 });
 export const AddPastPaperSchema = z.object({
     title: z.string().min(1, { message: 'Book Title is Required' }),
-    file: z.string().min(1, { message: 'Book File is Required' }),
+    school: z.string().min(1, {message: "School is Required"}),
+    file: z
+        .any()
+        .refine((file) => file instanceof File, { message: 'Book File is required' }),
 });
 export const AddBorrowedBookSchema = z.object({
     book_id: z.number().min(1, { message: 'Book is required' }),

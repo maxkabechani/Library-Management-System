@@ -11,5 +11,7 @@ CREATE TABLE borrowed_book (
     CONSTRAINT check_status CHECK (status IN ('borrowed', 'returned', 'overdue'))
 );
 
+
+
 -- Down Migration
 DROP TABLE IF EXISTS borrow_book;

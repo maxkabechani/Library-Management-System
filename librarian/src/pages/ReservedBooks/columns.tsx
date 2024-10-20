@@ -11,8 +11,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { reservedToBorrowed } from "@/services/api"
+import { AxiosError } from "axios"
 
 export type ReservedBook = {
+    reservation_id: number,
     student_id: string,
     first_name: string,
     last_name: string,
@@ -22,6 +25,20 @@ export type ReservedBook = {
     edition: number,
 
 
+}
+
+async function handleReturn(id: number) {
+    try {
+        const res = await reservedToBorrowed(id);
+        if (res.data.success) {
+            window.location.reload();
+        }
+    } catch (error) {
+        console.log(error)
+        if (error instanceof AxiosError) {
+            console.log(error.response?.data)
+        }
+    }
 }
 
 export const columns: ColumnDef<ReservedBook>[] = [
@@ -48,7 +65,7 @@ export const columns: ColumnDef<ReservedBook>[] = [
     {
         id: "actions",
         cell: ({ row }) => {
-            const book = row.original
+            const reservation = row.original
 
             return (
                 <DropdownMenu>
@@ -61,7 +78,7 @@ export const columns: ColumnDef<ReservedBook>[] = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(book.title)}
+                            onClick={() => handleReturn(reservation.reservation_id)}
                         >
                             Change to Borrowed
                         </DropdownMenuItem>

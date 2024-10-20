@@ -174,17 +174,35 @@ export const fetchPastPapers = async () => {
 }
 
 
-export const addPastPaper = async (title: string,
-    file: string,) => {
+export const addPastPaper = async (title: string, schoolId: string,
+    file: File,) => {
     try {
-        const response = await axios.post('/past-paper', {
-            title,
-            file
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('school_id', schoolId);
+        formData.append('file', file);
+
+        const response = await axios.post('/past-paper', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
         });
+
         return response.data;
     } catch (error) {
-        console.error('Error adding book:', error);
+        console.error('Error adding past paper:', error);
         throw error;
     }
 }
 
+
+export const reservedToBorrowed = async (id: number) => {
+    const response = await axios.post(`/reserved-borrowed/${id}`);
+    return response;
+}
+
+
+export const getSchools = async () => {
+    const response = await axios.get('/schools')
+    return response.data;
+}

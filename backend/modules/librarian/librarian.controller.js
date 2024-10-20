@@ -1,6 +1,7 @@
-import fs from 'fs';
-import { join } from 'path';
-import { existsSync, mkdirSync } from 'fs';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
+import { createWriteStream } from 'fs';
+import path from 'path';
 
 export async function getLibrarian(req, reply) {
     if (req.session.librarian) {
@@ -68,6 +69,15 @@ export async function createLibrarian(req, reply) {
     }
 
 
+}
+
+export async function getSchools(req, reply) {
+    try {
+        const schools = await req.server.queryDb("SELECT school_id, name FROM school");
+        return schools;
+    } catch (error) {
+        return error;
+    }
 }
 
 
@@ -177,7 +187,7 @@ export async function returnBook(req, reply) {
 
 export async function getReservedBooks(req, reply) {
     try {
-        const query = "SELECT student.student_id, student.first_name, student.last_name, book.title, book.author, published_year, book.edition FROM student JOIN reserved_book ON reserved_book. student_id = student.student_id JOIN book ON book.book_id = reserved_book.book_id;"
+        const query = "SELECT reservation_id, student.student_id, student.first_name, student.last_name, book.title, book.author, published_year, book.edition FROM student JOIN reserved_book ON reserved_book. student_id = student.student_id JOIN book ON book.book_id = reserved_book.book_id;"
         const books = await req.server.queryDb(query)
         return books;
 
@@ -189,12 +199,26 @@ export async function getReservedBooks(req, reply) {
 
 export async function reservedToBorrowed(req, reply) {
     try {
-        const { id } = req.params
-        const reserved_book = await req.server.queryDb("SELECT * FROM reserved_book WHERE reserved_id =  $1", [id]);
-        const info = reserved_book[0]
-        const borrow_book = req.server.queryDb("INSERT INTO borrowed_book (book_id, student_id, librarian_id, due_date, status) VALUES ($1, $2, $3, $4, 'borrowed'", [info])
-    } catch (error) {
+        const { id } = req.params;
+        const reserved_book = await req.server.queryDb("SELECT * FROM reserved_book WHERE reservation_id = $1", [id]);
+        if (reserved_book.length === 0) {
+            return reply.status(404).send({ success: false, message: "Reservation not found" });
+        }
 
+        const info = reserved_book[0];
+
+        const borrow_book = await req.server.queryDb(
+            `INSERT INTO borrowed_book (book_id, student_id, librarian_id, due_date, status)
+             VALUES ($1, $2, $3, CURRENT_DATE + INTERVAL '14 days', 'borrowed')`,
+            [info.book_id, info.student_id, req.session.librarian.id]
+        );
+
+        await req.server.queryDb("UPDATE reserved_book SET status = 'fulfilled' WHERE reservation_id = $1", [id]);
+
+        return reply.send({ success: true, message: "Book successfully borrowed" });
+    } catch (error) {
+        console.error(error);
+        return reply.status(500).send({ success: false, message: "An error occurred" });
     }
 }
 
@@ -248,43 +272,53 @@ export async function getPastPapers(req, reply) {
     }
 }
 
+const pump = promisify(pipeline);
+
 export async function addPastPaper(req, reply) {
+    // Handle file upload
+    const data = await req.file();
+
+    if (!data) {
+        return reply.status(400).send({ success: false, message: 'No file uploaded' });
+    }
+
+    // Access title from data.fields
+    const title = data.fields?.title?.value;
+    const school = data.fields?.school_id?.value;
+    console.log(school);
+
+    if (!title) {
+        return reply.status(400).send({ success: false, message: 'No title provided' });
+    }
+
+    // Generate file name and path
+    const fileName = `${data.filename}`;
+    const filePath = path.join('uploads/past-papers', fileName);
+    const query = `INSERT INTO past_paper (title, file_path, school_id, uploader_id)
+            VALUES ($1, $2, $3, $4) RETURNING *;`;
+    const values = [title, fileName, school, req.session.librarian.id];
+
     try {
-        const { title } = req.body;
+        // Save the file stream to disk
+        await pump(data.file, createWriteStream(filePath));
 
-        // Ensure the uploads directory exists
-        const uploadDir = join(__dirname, 'uploads');
-        if (!existsSync(uploadDir)) {
-            mkdirSync(uploadDir);
-        }
 
-        // Handle file upload
-        const data = await req.file();
+        // Return success response
+        const result = await req.server.queryDb(query, values);
+        const insertedRecord = result[0];
+        console.log(insertedRecord)
 
-        // File details
-        const fileName = data.filename;
-        const fileStream = data.file;
-        const filePath = join(uploadDir, fileName);
-
-        // Save file to disk
-        const writeStream = fs.createWriteStream(filePath);
-        fileStream.pipe(writeStream);
-
-        // Await file writing
-        await new Promise((resolve, reject) => {
-            writeStream.on('finish', resolve);
-            writeStream.on('error', reject);
+        // Return success response with the inserted record
+        return reply.send({
+            success: true,
+            message: 'Past paper added successfully',
+            data: insertedRecord,
         });
-
-        // Insert file metadata and path into the database
-        const paper = await req.server.queryDb(
-            "INSERT INTO past_paper (title, file) VALUES ($1, $2) RETURNING *",
-            [title, filePath]
-        );
-
-        reply.send({ success: true, message: 'Past paper uploaded successfully!', paper });
-    } catch (error) {
-        console.error(error);
-        reply.status(500).send({ success: false, message: 'Error uploading the file.' });
+    } catch (err) {
+        req.server.log.error(err);
+        return reply.status(500).send({
+            success: false,
+            message: 'Error uploading file',
+        });
     }
 }

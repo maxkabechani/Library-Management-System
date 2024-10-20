@@ -165,8 +165,6 @@ export default function App() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>{user?.first_name} {user?.last_name}</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
